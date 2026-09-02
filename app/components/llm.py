@@ -25,7 +25,7 @@ def load_llm():
         logger.info("Loading Groq LLM")
 
         llm = ChatGroq(
-            model="llama-3.1-8b-instant",
+            model="qwen/qwen3.6-27b",
             temperature=0.2,
             max_tokens=512,
             groq_api_key=GROQ_API_KEY,
