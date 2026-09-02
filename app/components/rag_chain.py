@@ -3,12 +3,9 @@ from langchain_core.runnables import RunnablePassthrough
 
 from app.common.logger import get_logger
 from app.common.custom_exception import CustomException
+
 from app.components.llm import load_llm
 from app.components.retriever import get_retriever
-from app.config.config import (
-    HUGGINGFACE_REPO_ID,
-    HF_TOKEN,
-)
 
 
 logger = get_logger(__name__)
@@ -50,7 +47,7 @@ def get_prompt_template() -> PromptTemplate:
 
 def format_documents(documents) -> str:
     """
-    Combine retrieved document chunks into a single context string.
+    Combine retrieved documents into a single context string.
     """
 
     return "\n\n".join(
@@ -60,32 +57,19 @@ def format_documents(documents) -> str:
 
 
 def create_rag_chain(k: int = 4):
-    """
-    Create the complete RAG chain.
-
-    Args:
-        k: Number of relevant document chunks to retrieve.
-
-    Returns:
-        Configured RAG chain.
-    """
-
     try:
         logger.info("Creating RAG chain")
 
         # Load retriever
         retriever = get_retriever(k=k)
 
-        # Load LLM
-        llm = load_llm(
-            huggingface_repo_id=HUGGINGFACE_REPO_ID,
-            hf_token=HF_TOKEN,
-        )
+        # Load Groq LLM
+        llm = load_llm()
 
         # Load prompt template
         prompt = get_prompt_template()
 
-        # Create RAG pipeline
+        # Create RAG chain
         rag_chain = (
             {
                 "context": retriever | format_documents,
@@ -130,7 +114,7 @@ if __name__ == "__main__":
             f"{test_question}"
         )
 
-        # Get response
+        # Generate response
         response = rag_chain.invoke(test_question)
 
         print("\n" + "=" * 60)
@@ -141,7 +125,9 @@ if __name__ == "__main__":
         print(test_question)
 
         print("\nAnswer:")
-        print(response)
+
+        # ChatGroq returns an AIMessage
+        print(response.content)
 
     except Exception as e:
         print(f"\nError: {e}")
