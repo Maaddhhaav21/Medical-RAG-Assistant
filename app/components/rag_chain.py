@@ -12,17 +12,25 @@ logger = get_logger(__name__)
 
 
 CUSTOM_PROMPT_TEMPLATE = """
-You are a helpful medical information assistant.
+You are a Medical RAG Assistant.
 
-Answer the user's question using ONLY the information provided
-in the context below.
+Answer the user's question using ONLY the information provided in the context.
 
-If the answer cannot be found in the provided context, say:
+IMPORTANT RULES:
+1. Use ONLY the provided context.
+2. Do not use outside knowledge.
+3. Do not invent or assume information that is not present in the context.
+4. Do not reveal your internal reasoning process.
+5. Do not output <think> or </think> tags.
+6. Do not provide step-by-step internal reasoning.
+7. Provide a detailed and well-explained answer when sufficient information is available.
+8. Do not give an unnecessarily short answer.
+9. Organize the answer into clear paragraphs.
+10. Explain important concepts mentioned in the context when they are relevant to the user's question.
 
-"I could not find enough information in the provided documents
-to answer this question."
+If the answer cannot be found in the provided context, say exactly:
 
-Do not make up information or use outside knowledge.
+"I could not find enough information in the provided documents to answer this question."
 
 Context:
 {context}
@@ -41,7 +49,10 @@ def get_prompt_template() -> PromptTemplate:
 
     return PromptTemplate(
         template=CUSTOM_PROMPT_TEMPLATE,
-        input_variables=["context", "question"]
+        input_variables=[
+            "context",
+            "question"
+        ]
     )
 
 
@@ -50,30 +61,37 @@ def format_documents(documents) -> str:
     Combine retrieved documents into a single context string.
     """
 
+    if not documents:
+        return ""
+
     return "\n\n".join(
         document.page_content
         for document in documents
     )
 
 
-def create_rag_chain(k: int = 4):
+def create_rag_chain(k: int = 8):
+
     try:
-        logger.info("Creating RAG chain")
+
+        logger.info(
+            "Creating RAG chain"
+        )
 
         # Load retriever
         retriever = get_retriever(k=k)
 
-        # Load Groq LLM
+        # Load LLM
         llm = load_llm()
 
-        # Load prompt template
+        # Create prompt
         prompt = get_prompt_template()
 
         # Create RAG chain
         rag_chain = (
             {
                 "context": retriever | format_documents,
-                "question": RunnablePassthrough(),
+                "question": RunnablePassthrough()
             }
             | prompt
             | llm
@@ -89,22 +107,25 @@ def create_rag_chain(k: int = 4):
         raise
 
     except Exception as e:
+
         error_message = CustomException(
             "Failed to create RAG chain",
             e
         )
 
-        logger.error(str(error_message))
+        logger.error(
+            str(error_message)
+        )
+
         raise error_message
 
 
 if __name__ == "__main__":
 
     try:
-        # Create RAG chain
+
         rag_chain = create_rag_chain(k=4)
 
-        # Test question
         test_question = (
             "What are the major functions of the heart?"
         )
@@ -114,8 +135,9 @@ if __name__ == "__main__":
             f"{test_question}"
         )
 
-        # Generate response
-        response = rag_chain.invoke(test_question)
+        response = rag_chain.invoke(
+            test_question
+        )
 
         print("\n" + "=" * 60)
         print("RAG CHAIN TEST SUCCESSFUL")
@@ -125,9 +147,10 @@ if __name__ == "__main__":
         print(test_question)
 
         print("\nAnswer:")
-
-        # ChatGroq returns an AIMessage
         print(response.content)
 
     except Exception as e:
-        print(f"\nError: {e}")
+
+        print(
+            f"\nError: {e}"
+        )

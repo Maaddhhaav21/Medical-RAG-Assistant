@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Medical Chatbot</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --paper: #FBFBF9;
+            --ink: #16242E;
+            --ink-2: #1F3540;
+            --text: #1B2B39;
+            --text-soft: #3A4A56;
+            --slate: #6B7785;
+            --on-dark: #EDEEE9;
+            --on-dark-soft: #A6B3B0;
+            --teal: #2F6F6B;
+            --teal-dark: #204E4B;
+            --teal-tint: #E7EFEE;
+            --teal-bright: #6FC2B4;
+            --alert: #A3403A;
+            --alert-tint: #F7EAE8;
+            --hairline: #DDE3DF;
+            --hairline-strong: #C6CEC9;
+            --radius: 3px;
+        }
+
+        * { box-sizing: border-box; }
+
+        @media (prefers-reduced-motion: reduce) {
+            * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+        }
+
+        html, body { height: 100%; margin: 0; }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--paper);
+            color: var(--text);
+            display: flex;
+            min-height: 100vh;
+            font-size: 15px;
+            line-height: 1.55;
+        }
+
+        a { color: var(--teal-dark); }
+
+        /* ---------- Rail ---------- */
+        .rail {
+            width: 300px;
+            flex-shrink: 0;
+            background: var(--ink);
+            color: var(--on-dark);
+            padding: 2.25rem 1.85rem;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .brand-mark {
+            width: 30px;
+            height: 30px;
+            flex-shrink: 0;
+        }
+
+        .brand-text {
+            font-family: 'Source Serif 4', Georgia, serif;
+            font-size: 1.08rem;
+            font-weight: 600;
+            line-height: 1.25;
+            color: var(--on-dark);
+        }
+
+        .brand-text span {
+            display: block;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            font-size: 0.68rem;
+            color: var(--teal-bright);
+            margin-top: 0.2rem;
+        }
+
+        .pulse-wrap {
+            margin: 1.6rem 0 1.75rem;
+            height: 34px;
+        }
+
+        .pulse-wrap svg { display: block; width: 100%; height: 100%; }
+
+        .pulse-line {
+            fill: none;
+            stroke: var(--teal-bright);
+            stroke-width: 1.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            stroke-dasharray: 260;
+            stroke-dashoffset: 260;
+            animation: draw 1.4s ease-out 0.15s forwards;
+        }
+
+        @keyframes draw {
+            to { stroke-dashoffset: 0; }
+        }
+
+        .lede {
+            font-size: 0.86rem;
+            color: var(--on-dark-soft);
+            line-height: 1.6;
+            margin: 0 0 1.9rem;
+        }
+
+        .steps {
+            list-style: none;
+            margin: 0 0 1.9rem;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.9rem;
+        }
+
+        .steps li {
+            display: flex;
+            gap: 0.75rem;
+            align-items: flex-start;
+        }
+
+        .step-num {
+            font-family: 'Source Serif 4', Georgia, serif;
+            font-size: 0.82rem;
+            color: var(--teal-bright);
+            width: 1.1rem;
+            flex-shrink: 0;
+            padding-top: 0.1rem;
+        }
+
+        .step-body strong {
+            display: block;
+            font-size: 0.83rem;
+            font-weight: 600;
+            color: var(--on-dark);
+            margin-bottom: 0.15rem;
+        }
+
+        .step-body p {
+            margin: 0;
+            font-size: 0.78rem;
+            color: var(--on-dark-soft);
+            line-height: 1.5;
+        }
+
+        .notice {
+            font-size: 0.8rem;
+            color: var(--on-dark-soft);
+            line-height: 1.6;
+            padding: 0.95rem 1rem;
+            border: 1px solid rgba(237,238,233,0.14);
+            border-radius: var(--radius);
+            background: rgba(237,238,233,0.03);
+        }
+
+        .notice strong {
+            display: block;
+            color: var(--on-dark);
+            font-weight: 600;
+            margin-bottom: 0.35rem;
+            font-size: 0.82rem;
+        }
+
+        .rail-footer {
+            margin-top: auto;
+            font-size: 0.72rem;
+            color: rgba(166,179,176,0.7);
+            padding-top: 1.75rem;
+        }
+
+        /* ---------- Main ---------- */
+        .main {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            min-width: 0;
+            background-image:
+                linear-gradient(var(--hairline) 1px, transparent 1px);
+            background-size: 100% 2.6rem;
+            background-position: 0 6.5rem;
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 720px;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            padding: 0 2.25rem;
+        }
+
+        .chat-header {
+            padding: 2.75rem 0 1.5rem;
+            flex-shrink: 0;
+            background: var(--paper);
+        }
+
+        .chat-header h1 {
+            font-family: 'Source Serif 4', Georgia, serif;
+            font-weight: 600;
+            font-size: 1.85rem;
+            letter-spacing: -0.01em;
+            margin: 0 0 0.5rem;
+            color: var(--text);
+        }
+
+        .chat-header p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: var(--slate);
+            max-width: 46ch;
+        }
+
+        .error-banner {
+            margin-top: 1.5rem;
+            padding: 0.85rem 1rem;
+            background: var(--alert-tint);
+            border-left: 3px solid var(--alert);
+            border-radius: var(--radius);
+            color: #6E2B27;
+            font-size: 0.88rem;
+        }
+
+        /* ---------- Chat box ---------- */
+        #chat-box {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0.5rem 0 1.75rem;
+            scrollbar-width: thin;
+            scrollbar-color: var(--hairline-strong) transparent;
+        }
+
+        #chat-box::-webkit-scrollbar { width: 8px; }
+        #chat-box::-webkit-scrollbar-thumb {
+            background: var(--hairline-strong);
+            border-radius: 4px;
+        }
+
+        .empty-state {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: center;
+            color: var(--slate);
+            max-width: 420px;
+        }
+
+        .empty-state h2 {
+            font-family: 'Source Serif 4', Georgia, serif;
+            font-weight: 500;
+            font-size: 1.15rem;
+            color: var(--text-soft);
+            margin: 0 0 0.5rem;
+        }
+
+        .empty-state p { margin: 0; font-size: 0.88rem; line-height: 1.6; }
+
+        .message {
+            margin-bottom: 1.65rem;
+            max-width: 90%;
+        }
+
+        .message .role-label {
+            font-size: 0.72rem;
+            font-weight: 500;
+            color: var(--slate);
+            margin-bottom: 0.4rem;
+        }
+
+        .message.user { margin-left: auto; }
+        .message.user .role-label { text-align: right; }
+
+        .message.user .bubble {
+            background: var(--teal-tint);
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius);
+            color: var(--text);
+        }
+
+        .message.assistant .bubble {
+            padding: 0.15rem 0 0.15rem 1.05rem;
+            border-left: 2px solid var(--teal);
+            color: var(--text-soft);
+        }
+
+        .message .bubble { font-size: 0.94rem; line-height: 1.68; }
+        .message .bubble p:first-child { margin-top: 0; }
+        .message .bubble p:last-child { margin-bottom: 0; }
+
+        .sources {
+            margin-top: 0.75rem;
+            padding-left: 1.05rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .source-chip {
+            font-size: 0.76rem;
+            color: var(--teal-dark);
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .source-chip .n {
+            font-family: 'Source Serif 4', Georgia, serif;
+            color: var(--teal);
+            flex-shrink: 0;
+        }
+
+        /* ---------- Composer ---------- */
+        .composer {
+            flex-shrink: 0;
+            padding: 1rem 0 1.75rem;
+            background: var(--paper);
+        }
+
+        .composer-card {
+            border: 1px solid var(--hairline-strong);
+            border-radius: 6px;
+            background: #fff;
+            padding: 0.85rem 0.9rem 0.7rem;
+            box-shadow: 0 8px 20px -14px rgba(22,36,46,0.35);
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .composer-card:focus-within {
+            border-color: var(--teal);
+            box-shadow: 0 8px 20px -14px rgba(22,36,46,0.35), 0 0 0 3px var(--teal-tint);
+        }
+
+        textarea {
+            width: 100%;
+            resize: none;
+            min-height: 2.5rem;
+            max-height: 9rem;
+            padding: 0.15rem 0;
+            font-family: inherit;
+            font-size: 0.95rem;
+            color: var(--text);
+            background: transparent;
+            border: none;
+            outline: none;
+            display: block;
+        }
+
+        textarea::placeholder { color: #9AA5A2; }
+
+        .composer-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0.5rem;
+            padding-top: 0.6rem;
+            border-top: 1px solid var(--hairline);
+        }
+
+        .composer-disclaimer {
+            font-size: 0.72rem;
+            color: var(--slate);
+            margin: 0;
+        }
+
+        button {
+            font-family: inherit;
+            font-size: 0.87rem;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: var(--radius);
+            border: none;
+            transition: background 0.15s ease, opacity 0.15s ease;
+        }
+
+        button:focus-visible,
+        textarea:focus-visible { outline: 2px solid var(--teal-dark); outline-offset: 2px; }
+
+        .send-btn {
+            background: var(--teal-dark);
+            color: var(--paper);
+            padding: 0.55rem 1.2rem;
+        }
+
+        .send-btn:hover { background: var(--teal); }
+
+        .utility-row {
+            margin-top: 0.9rem;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .clear-form { margin: 0; }
+
+        .clear-btn {
+            background: none;
+            color: var(--slate);
+            padding: 0.3rem 0;
+            font-size: 0.8rem;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+
+        .clear-btn:hover { color: var(--alert); }
+
+        /* ---------- Responsive ---------- */
+        @media (max-width: 780px) {
+            body { flex-direction: column; }
+
+            .rail {
+                width: 100%;
+                padding: 1.5rem 1.5rem 1.25rem;
+            }
+
+            .steps, .rail-footer { display: none; }
+            .pulse-wrap { margin: 1.25rem 0; height: 26px; }
+
+            .main { background-position: 0 5rem; }
+
+            .chat-container {
+                height: auto;
+                min-height: calc(100vh - 220px);
+                padding: 0 1.25rem;
+            }
+
+            .chat-header { padding-top: 1.5rem; }
+            .chat-header h1 { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <aside class="rail">
+        <div class="brand">
+            <svg class="brand-mark" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="13" y="4" width="4" height="22" rx="1" fill="#6FC2B4"/>
+                <rect x="4" y="13" width="22" height="4" rx="1" fill="#EDEEE9"/>
+            </svg>
+            <p class="brand-text">Medical Chatbot<span>Retrieval-grounded answers</span></p>
+        </div>
+
+        <div class="pulse-wrap">
+            <svg viewBox="0 0 260 34" preserveAspectRatio="none">
+                <path class="pulse-line" d="M0,20 L55,20 L68,20 L76,4 L88,32 L98,14 L106,20 L260,20" />
+            </svg>
+        </div>
+
+        <p class="lede">Every answer below is assembled from indexed clinical reference material, then checked against the source passages before it's shown to you.</p>
+
+        <ol class="steps">
+            <li>
+                <span class="step-num">01</span>
+                <span class="step-body">
+                    <strong>Retrieve</strong>
+                    <p>Your question is matched against the indexed reference library.</p>
+                </span>
+            </li>
+            <li>
+                <span class="step-num">02</span>
+                <span class="step-body">
+                    <strong>Synthesize</strong>
+                    <p>Relevant passages are combined into a single, direct answer.</p>
+                </span>
+            </li>
+            <li>
+                <span class="step-num">03</span>
+                <span class="step-body">
+                    <strong>Cite</strong>
+                    <p>Sources are listed beneath the answer so you can verify it.</p>
+                </span>
+            </li>
+        </ol>
+
+        <div class="notice">
+            <strong>Before you ask</strong>
+            This tool does not diagnose, prescribe, or replace a clinician. For urgent symptoms, contact emergency services.
+        </div>
+
+        <p class="rail-footer">Session is not stored beyond this browser tab.</p>
+    </aside>
+
+    <main class="main">
+        <div class="chat-container">
+            <div class="chat-header">
+                <h1>Ask a clinical question</h1>
+                <p>Answers are drawn from indexed source material and cited below each response.</p>
+
+                {% if error %}
+                    <div class="error-banner">{{ error }}</div>
+                {% endif %}
+            </div>
+
+            <div id="chat-box">
+                <div class="empty-state" id="empty-state">
+                    <h2>No questions asked yet</h2>
+                    <p>Try something specific — for example, ask about an organ, body system, symptom, or physiological process. The chatbot will answer using the indexed medical reference material.</p>
+                </div>
+            </div>
+
+            <div class="composer">
+                <form id="composer-form">
+                    <div class="composer-card">
+                        <textarea name="prompt" id="prompt-input" placeholder="Ask a medical question…" required></textarea>
+                        <div class="composer-row">
+                            <p class="composer-disclaimer">Not a substitute for professional medical advice.</p>
+                            <button type="submit" class="send-btn">Send</button>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="utility-row">
+                    <button type="button" id="clear-chat" class="clear-btn">Clear chat</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const chatBox = document.getElementById("chat-box");
+        const form = document.getElementById("composer-form");
+        const promptInput = document.getElementById("prompt-input");
+        const clearButton = document.getElementById("clear-chat");
+
+        function scrollToBottom() {
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function removeEmptyState() {
+            const emptyState = document.getElementById("empty-state");
+
+            if (emptyState) {
+                emptyState.remove();
+            }
+        }
+
+        function createMessage(content, role) {
+            removeEmptyState();
+
+            const message = document.createElement("div");
+            message.className = `message ${role}`;
+
+            const roleLabel = document.createElement("div");
+            roleLabel.className = "role-label";
+            roleLabel.textContent =
+                role === "user" ? "You" : "Medical RAG Assistant";
+
+            const bubble = document.createElement("div");
+            bubble.className = "bubble";
+
+            // textContent safely renders plain-text API responses.
+            bubble.textContent = content;
+
+            message.appendChild(roleLabel);
+            message.appendChild(bubble);
+
+            chatBox.appendChild(message);
+            scrollToBottom();
+
+            return message;
+        }
+
+        function createLoadingMessage() {
+            return createMessage("Thinking…", "assistant");
+        }
+
+        function showEmptyState() {
+            if (document.getElementById("empty-state")) {
+                return;
+            }
+
+            const emptyState = document.createElement("div");
+            emptyState.className = "empty-state";
+            emptyState.id = "empty-state";
+
+            emptyState.innerHTML = `
+                <h2>No questions asked yet</h2>
+                <p>Try something specific — for example, ask about an organ, body system, symptom, or physiological process. The chatbot will answer using the indexed medical reference material.</p>
+            `;
+
+            chatBox.appendChild(emptyState);
+        }
+
+        function autoResizeTextarea() {
+            promptInput.style.height = "auto";
+            promptInput.style.height =
+                Math.min(promptInput.scrollHeight, 144) + "px";
+        }
+
+        promptInput.addEventListener("input", autoResizeTextarea);
+
+        form.addEventListener("submit", async function (event) {
+            event.preventDefault();
+
+            const question = promptInput.value.trim();
+
+            if (!question) {
+                return;
+            }
+
+            createMessage(question, "user");
+
+            promptInput.value = "";
+            promptInput.style.height = "auto";
+
+            const sendButton = form.querySelector(".send-btn");
+            sendButton.disabled = true;
+            sendButton.textContent = "Sending…";
+
+            const loadingMessage = createLoadingMessage();
+
+            try {
+                const response = await fetch("/api/ask", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        question: question
+                    })
+                });
+
+                const data = await response.json();
+
+                loadingMessage.remove();
+
+                if (!response.ok || data.status !== "success") {
+                    createMessage(
+                        data.message ||
+                        "Sorry, something went wrong while generating the answer.",
+                        "assistant"
+                    );
+                    return;
+                }
+
+                createMessage(data.answer, "assistant");
+
+            } catch (error) {
+                console.error("Medical RAG API error:", error);
+
+                loadingMessage.remove();
+
+                createMessage(
+                    "Unable to connect to the Medical RAG server. Please make sure the Flask application is running and try again.",
+                    "assistant"
+                );
+
+            } finally {
+                sendButton.disabled = false;
+                sendButton.textContent = "Send";
+                promptInput.focus();
+            }
+        });
+
+        promptInput.addEventListener("keydown", function (event) {
+            if (event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault();
+                form.requestSubmit();
+            }
+        });
+
+        clearButton.addEventListener("click", function () {
+            chatBox.innerHTML = "";
+            showEmptyState();
+            promptInput.focus();
+        });
+
+        scrollToBottom();
+    </script>
+
+</body>
+</html>

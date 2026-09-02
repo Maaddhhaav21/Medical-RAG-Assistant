@@ -11,9 +11,6 @@ logger = get_logger(__name__)
 def load_llm():
     """
     Load the Groq LLM.
-
-    Returns:
-        Configured ChatGroq model.
     """
 
     try:
@@ -22,13 +19,26 @@ def load_llm():
                 "GROQ_API_KEY is missing"
             )
 
-        logger.info("Loading Groq LLM")
+        logger.info(
+            "Loading Groq LLM"
+        )
 
         llm = ChatGroq(
             model="qwen/qwen3.6-27b",
+
+            # Lower temperature for factual RAG answers
             temperature=0.2,
-            max_tokens=512,
+
+            # Maximum final response length
+            max_tokens=1024,
+
             groq_api_key=GROQ_API_KEY,
+
+            # IMPORTANT: Disable the model's reasoning mode
+            reasoning_effort="none",
+
+            # IMPORTANT: Return only the final answer
+            reasoning_format="hidden",
         )
 
         logger.info(
@@ -41,18 +51,23 @@ def load_llm():
         raise
 
     except Exception as e:
+
         error_message = CustomException(
             "Failed to load Groq LLM",
             e
         )
 
-        logger.error(str(error_message))
+        logger.error(
+            str(error_message)
+        )
+
         raise error_message
 
 
 if __name__ == "__main__":
 
     try:
+
         llm = load_llm()
 
         test_question = (
@@ -60,7 +75,9 @@ if __name__ == "__main__":
             "in simple terms."
         )
 
-        logger.info("Testing LLM")
+        logger.info(
+            "Testing LLM"
+        )
 
         response = llm.invoke(
             test_question
@@ -74,4 +91,7 @@ if __name__ == "__main__":
         print(response.content)
 
     except Exception as e:
-        print(f"\nError: {e}")
+
+        print(
+            f"\nError: {e}"
+        )
