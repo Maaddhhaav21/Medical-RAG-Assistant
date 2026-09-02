@@ -1,19 +1,37 @@
 import logging
-import os
-from datetime import datetime
+from pathlib import Path
 
-LOGS_DIR = "logs"
-os.makedirs(LOGS_DIR,exist_ok=True)
+from app.config.config import LOG_DIR
 
-LOG_FILE = os.path.join(LOGS_DIR, f"log_{datetime.now().strftime('%Y-%m-%d')}.log")
 
-logging.basicConfig(
-    filename=LOG_FILE,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    level=logging.INFO
-)
+def get_logger(name: str) -> logging.Logger:
+    """Create and return a configured application logger."""
 
-def get_logger(name):
+    LOG_DIR.mkdir(parents=True, exist_ok=True)
+
     logger = logging.getLogger(name)
+
+    # Prevent duplicate handlers
+    if logger.handlers:
+        return logger
+
     logger.setLevel(logging.INFO)
+
+    formatter = logging.Formatter(
+        "%(asctime)s | %(levelname)s | %(name)s | %(message)s"
+    )
+
+    # Console handler
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(formatter)
+
+    # File handler
+    log_file = Path(LOG_DIR) / "application.log"
+
+    file_handler = logging.FileHandler(log_file)
+    file_handler.setFormatter(formatter)
+
+    logger.addHandler(console_handler)
+    logger.addHandler(file_handler)
+
     return logger

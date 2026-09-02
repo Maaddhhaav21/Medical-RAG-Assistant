@@ -1,0 +1,27 @@
+# Web Framework
+flask
+
+# Environment Variables
+python-dotenv
+
+# LangChain
+langchain
+langchain-core
+langchain-community
+langchain-huggingface
+langchain-text-splitters
+
+# Vector Store
+faiss-cpu
+
+# Embeddings
+sentence-transformers
+
+# Hugging Face
+huggingface-hub
+
+# PDF Processing
+pymupdf
+
+# Optional: Testing
+pytest
