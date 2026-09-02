@@ -10,6 +10,7 @@ langchain-core
 langchain-community
 langchain-huggingface
 langchain-text-splitters
+langchain-groq
 
 # Vector Store
 faiss-cpu
