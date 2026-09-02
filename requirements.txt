@@ -1,7 +1,7 @@
 # Web Framework
 flask
 
-# Environment Variables
+# Environment Variable
 python-dotenv
 
 # LangChain
