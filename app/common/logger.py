@@ -3,7 +3,6 @@ from pathlib import Path
 
 from app.config.config import LOG_DIR
 
-
 def get_logger(name: str) -> logging.Logger:
     """Create and return a configured application logger."""
 

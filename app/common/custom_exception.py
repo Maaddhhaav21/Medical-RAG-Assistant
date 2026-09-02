@@ -1,5 +1,4 @@
 import sys
-
 class CustomException(Exception):
     """Custom exception with file and line information."""
 
