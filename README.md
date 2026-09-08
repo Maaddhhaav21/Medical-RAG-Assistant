@@ -26,7 +26,7 @@ The application is instructed to answer using the retrieved context rather than 
 
 ---
 
-# 🧠 System Architecture
+#  🧠 System Architecture
 
 ```text
                     ┌─────────────────┐
