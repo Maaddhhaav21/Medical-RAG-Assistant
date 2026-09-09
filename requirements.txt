@@ -26,3 +26,5 @@ pymupdf
 
 # Optional: Testing
 pytest
+
+gunicorn 
