@@ -1,10 +1,15 @@
 # 🩺 Medical RAG Assistant
 
-A Retrieval-Augmented Generation (RAG) application that answers medical questions using information retrieved from a medical knowledge base.
+A production-ready Retrieval-Augmented Generation (RAG) application for answering medical questions using information retrieved from a medical knowledge base.
 
-The application combines **FAISS**, **HuggingFace embeddings**, **LangChain**, **Groq LLMs**, and **Flask** to provide context-aware answers through an interactive web interface and REST API.
+The application combines **FAISS**, **HuggingFace embeddings**, **LangChain**, **Groq LLMs**, **Flask**, **Docker**, **Jenkins**, and **Railway** to provide context-aware answers through an interactive web interface and REST API.
 
 > ⚠️ **Disclaimer:** This project is intended for educational and research purposes only. It should not be considered a substitute for professional medical advice, diagnosis, or treatment.
+
+## 🌐 Live Demo
+
+**Railway:**  
+https://medical-rag-assistant-production-b715.up.railway.app
 
 ---
 
@@ -19,60 +24,61 @@ Instead of directly sending a user's question to the LLM, the system:
 1. Receives a medical question from the user.
 2. Searches a FAISS vector database for relevant medical information.
 3. Retrieves the most relevant document chunks.
-4. Passes the retrieved context and user question to the LLM.
-5. Generates a context-aware response.
+4. Combines the retrieved context with the user's question.
+5. Sends the grounded prompt to the Groq-hosted LLM.
+6. Generates and returns a context-aware answer.
 
-The application is instructed to answer using the retrieved context rather than relying solely on the model's general knowledge.
+The prompt is designed to keep the model grounded in the retrieved context and avoid unsupported information.
 
 ---
 
-#  🧠 System Architecture
+# 🧠 System Architecture
 
 ```text
-                    ┌─────────────────┐
-                    │   User Question │
-                    └────────┬────────┘
-                             │
-                             ▼
-                    ┌─────────────────┐
-                    │ Flask Web App   │
-                    └────────┬────────┘
-                             │
-                             ▼
-                    ┌─────────────────┐
-                    │   /api/ask      │
-                    └────────┬────────┘
-                             │
-                             ▼
-                    ┌─────────────────┐
-                    │    Retriever    │
-                    └────────┬────────┘
-                             │
-                             ▼
-                    ┌─────────────────┐
-                    │ FAISS Vector DB │
-                    └────────┬────────┘
-                             │
-                             ▼
-                    ┌─────────────────┐
-                    │ Relevant Context│
-                    └────────┬────────┘
-                             │
-                             ▼
-                    ┌─────────────────┐
-                    │ Prompt Template │
-                    └────────┬────────┘
-                             │
-                             ▼
-                    ┌─────────────────┐
-                    │    Groq LLM     │
-                    │ Qwen 3.6 27B    │
-                    └────────┬────────┘
-                             │
-                             ▼
-                    ┌─────────────────┐
-                    │  Final Answer   │
-                    └─────────────────┘
+                         ┌─────────────────────┐
+                         │    User Question    │
+                         └──────────┬──────────┘
+                                    │
+                                    ▼
+                         ┌─────────────────────┐
+                         │   Flask Web App     │
+                         └──────────┬──────────┘
+                                    │
+                                    ▼
+                         ┌─────────────────────┐
+                         │     /api/ask        │
+                         └──────────┬──────────┘
+                                    │
+                                    ▼
+                         ┌─────────────────────┐
+                         │     Retriever       │
+                         └──────────┬──────────┘
+                                    │
+                                    ▼
+                         ┌─────────────────────┐
+                         │   FAISS Vector DB   │
+                         └──────────┬──────────┘
+                                    │
+                                    ▼
+                         ┌─────────────────────┐
+                         │  Relevant Context   │
+                         └──────────┬──────────┘
+                                    │
+                                    ▼
+                         ┌─────────────────────┐
+                         │   Prompt Template   │
+                         └──────────┬──────────┘
+                                    │
+                                    ▼
+                         ┌─────────────────────┐
+                         │      Groq LLM       │
+                         │    Qwen 3.6 27B     │
+                         └──────────┬──────────┘
+                                    │
+                                    ▼
+                         ┌─────────────────────┐
+                         │     Final Answer    │
+                         └─────────────────────┘
 ```
 
 ---
@@ -82,53 +88,62 @@ The application is instructed to answer using the retrieved context rather than 
 - Retrieval-Augmented Generation pipeline
 - Medical document retrieval
 - FAISS vector similarity search
-- HuggingFace embeddings
+- HuggingFace sentence embeddings
+- LangChain-based RAG orchestration
 - Groq-powered LLM inference
-- LangChain-based RAG pipeline
+- Qwen 3.6 27B model
 - Flask REST API
-- Interactive web interface
-- Conversation history
+- Interactive medical chatbot interface
+- Conversation history in the web UI
 - Clear chat functionality
 - Health-check endpoint
 - Centralized logging
 - Custom exception handling
-- Environment variable configuration
+- Environment-variable configuration
+- Dockerized application
+- Production serving with Gunicorn
+- Jenkins CI pipeline
+- Trivy container security scanning
+- Railway deployment
 
 ---
 
 # 🛠️ Technology Stack
 
-| Technology   | Purpose                               |
-| ------------ | ------------------------------------- |
-| Python       | Core programming language             |
-| Flask        | Backend web framework                 |
-| LangChain    | RAG pipeline orchestration            |
-| FAISS        | Vector database and similarity search |
-| HuggingFace  | Text embedding generation             |
-| Groq         | High-speed LLM inference              |
-| Qwen 3.6 27B | Large Language Model                  |
-| HTML         | Frontend structure                    |
-| CSS          | Frontend styling                      |
-| JavaScript   | Frontend interactions                 |
+| Technology | Purpose |
+|---|---|
+| Python 3.12 | Core programming language |
+| Flask | Backend web framework |
+| LangChain | RAG pipeline orchestration |
+| FAISS | Vector database and similarity search |
+| HuggingFace | Text embedding generation |
+| `all-MiniLM-L6-v2` | Embedding model |
+| Groq | LLM inference |
+| Qwen 3.6 27B | Language model |
+| HTML / CSS | Frontend |
+| JavaScript | Frontend interactions |
+| Docker | Containerization |
+| Gunicorn | Production WSGI server |
+| Jenkins | Continuous integration |
+| Trivy | Container security scanning |
+| Railway | Cloud deployment |
 
 ---
 
 # 📂 Project Structure
 
 ```text
-Medical-RAG/
+Medical-RAG-Assistant/
 │
 ├── app/
-│   │
 │   ├── common/
-│   │   ├── __init__.py
 │   │   ├── custom_exception.py
 │   │   └── logger.py
 │   │
 │   ├── components/
-│   │   ├── __init__.py
 │   │   ├── document_loader.py
-│   │   ├── embedding.py
+│   │   ├── embeddings.py
+│   │   ├── ingestion.py
 │   │   ├── llm.py
 │   │   ├── rag_chain.py
 │   │   ├── retriever.py
@@ -136,30 +151,37 @@ Medical-RAG/
 │   │   └── vector_store.py
 │   │
 │   ├── config/
-│   │   ├── __init__.py
 │   │   └── config.py
 │   │
-│   ├── data/
-│   │   └── medical_documents/
-│   │
-│   ├── database/
-│   │   └── faiss_index/
-│   │
 │   ├── routes/
-│   │   ├── __init__.py
 │   │   └── api.py
 │   │
 │   ├── templates/
 │   │   └── index.html
 │   │
-│   ├── __init__.py
 │   └── application.py
 │
+├── custom_jenkins/
+│   └── Dockerfile
+│
+├── data/
+│   └── raw/
+│       └── anatomy_and_physiology.pdf
+│
+├── vectorstore/
+│   └── faiss_index/
+│       ├── index.faiss
+│       └── index.pkl
+│
 ├── logs/
+│
 ├── .env
 ├── .gitignore
-├── requirements.txt
 ├── Dockerfile
+├── Jenkinsfile
+├── pyproject.toml
+├── requirements.txt
+├── uv.lock
 └── README.md
 ```
 
@@ -169,7 +191,7 @@ Medical-RAG/
 
 ## 1. Document Processing
 
-Medical documents are loaded into the application and divided into smaller chunks.
+Medical documents are loaded and divided into smaller text chunks.
 
 ```text
 Medical Documents
@@ -181,50 +203,60 @@ Text Splitting
 Document Chunks
 ```
 
-Splitting large documents into smaller chunks improves retrieval because the application can identify specific sections that are relevant to a user's question.
+Chunking allows the retriever to find more focused and relevant information.
 
 ---
 
 ## 2. Embedding Generation
 
-Each document chunk is converted into a numerical vector using a HuggingFace embedding model.
+Each document chunk is converted into a numerical vector using the HuggingFace embedding model:
+
+```text
+sentence-transformers/all-MiniLM-L6-v2
+```
+
+The embedding model produces **384-dimensional vectors**.
 
 ```text
 Document Chunk
-       ↓
+      ↓
 Embedding Model
-       ↓
+      ↓
 Vector Representation
 ```
-
-Embeddings capture the semantic meaning of text, allowing the application to compare a user's question with the stored medical information.
 
 ---
 
 ## 3. FAISS Vector Storage
 
-The generated embeddings are stored in a FAISS vector database.
+The generated embeddings are stored in a FAISS vector index.
 
 ```text
 Document Chunks
-       ↓
+      ↓
 Generate Embeddings
-       ↓
+      ↓
 FAISS Vector Store
 ```
 
-FAISS enables efficient similarity searching across the medical knowledge base.
+The generated index is stored at:
+
+```text
+vectorstore/faiss_index/
+├── index.faiss
+└── index.pkl
+```
 
 ---
 
 ## 4. User Question
 
-The user enters a question through the web interface.
+The user enters a medical question through the web interface.
 
 Example:
 
 ```text
-What are the symptoms of anemia?
+What are the major functions of the heart?
 ```
 
 The frontend sends the question to the Flask backend.
@@ -233,7 +265,7 @@ The frontend sends the question to the Flask backend.
 
 ## 5. Document Retrieval
 
-The retriever searches the FAISS vector database for the most relevant document chunks.
+The retriever searches the FAISS vector store for the most relevant document chunks.
 
 ```text
 User Question
@@ -245,13 +277,11 @@ FAISS Vector Database
 Relevant Documents
 ```
 
-The application retrieves the top relevant documents before generating an answer.
-
 ---
 
 ## 6. Prompt Construction
 
-The retrieved documents are combined with the user's question using a prompt template.
+The retrieved documents are combined with the user's question using the RAG prompt template.
 
 ```text
 Retrieved Context
@@ -261,29 +291,29 @@ User Question
 Prompt Template
 ```
 
-The prompt instructs the LLM to answer based on the provided context.
+The prompt instructs the model to answer using the supplied context and not reveal internal reasoning.
 
 ---
 
 ## 7. Answer Generation
 
-The final prompt is sent to the Groq-hosted language model.
+The final prompt is sent to the Groq-hosted Qwen model.
 
 ```text
 Context + Question
         ↓
-      Groq LLM
+     Groq LLM
         ↓
-    Final Answer
+   Final Answer
 ```
 
-The generated answer is returned to the Flask backend and displayed in the web interface.
+The answer is returned by the Flask API and rendered in the web interface.
 
 ---
 
 # 🧠 RAG Chain
 
-The core RAG pipeline follows this flow:
+The complete RAG pipeline follows this flow:
 
 ```text
 User Question
@@ -295,7 +325,7 @@ User Question
         │
         ▼
 ┌───────────────┐
-│ FAISS Search  │
+│  FAISS Search │
 └───────┬───────┘
         │
         ▼
@@ -307,9 +337,9 @@ Relevant Documents
 └───────┬───────┘
         │
         ▼
-┌───────────────┐
+┌────────────────┐
 │ Prompt Template│
-└───────┬───────┘
+└───────┬────────┘
         │
         ▼
 ┌───────────────┐
@@ -317,10 +347,8 @@ Relevant Documents
 └───────┬───────┘
         │
         ▼
-    Final Answer
+   Final Answer
 ```
-
-The RAG chain retrieves relevant documents and formats them before passing the context to the language model.
 
 ---
 
@@ -387,38 +415,44 @@ POST /api/ask
 ## 1. Clone the Repository
 
 ```bash
-git clone <your-repository-url>
-```
-
-Navigate into the project directory:
-
-```bash
-cd Medical-RAG
+git clone https://github.com/Maaddhhaav21/Medical-RAG-Assistant.git
+cd Medical-RAG-Assistant
 ```
 
 ---
 
 ## 2. Create a Virtual Environment
 
-```bash
-python -m venv .venv
-```
-
-### macOS/Linux
+Using `uv`:
 
 ```bash
+uv venv
 source .venv/bin/activate
 ```
 
-### Windows
+On Windows:
 
 ```bash
 .venv\Scripts\activate
 ```
 
+Alternatively, using Python directly:
+
+```bash
+python -m venv .venv
+```
+
 ---
 
 ## 3. Install Dependencies
+
+Using `uv`:
+
+```bash
+uv sync
+```
+
+Or using pip:
 
 ```bash
 pip install -r requirements.txt
@@ -428,15 +462,15 @@ pip install -r requirements.txt
 
 # 🔐 Environment Variables
 
-Create a `.env` file in the root directory of the project.
+Create a `.env` file in the project root:
 
 ```env
 GROQ_API_KEY=your_groq_api_key_here
 ```
 
-Do not upload your API key to GitHub.
+Never commit your API key to GitHub.
 
-Your `.gitignore` should include:
+The `.gitignore` should contain entries such as:
 
 ```text
 .env
@@ -448,7 +482,7 @@ logs/
 
 ---
 
-# ▶️ Running the Application
+# ▶️ Running Locally
 
 Start the Flask application:
 
@@ -456,19 +490,19 @@ Start the Flask application:
 python app/application.py
 ```
 
-The application will run on:
+The application runs on:
 
 ```text
 http://127.0.0.1:5001
 ```
 
-Open this address in your browser to access the Medical RAG Assistant.
+Open the address in your browser to access the Medical RAG Assistant.
 
 ---
 
 # 🧪 Testing the RAG Pipeline
 
-The RAG chain can be tested directly using the test block in `rag_chain.py`.
+The RAG chain can be tested directly through the application components.
 
 Example:
 
@@ -480,7 +514,7 @@ response = rag_chain.invoke(test_question)
 print(response.content)
 ```
 
-This retrieves relevant documents from the vector store and generates an answer using the configured LLM.
+This retrieves relevant documents from FAISS and generates an answer using the configured LLM.
 
 ---
 
@@ -488,79 +522,212 @@ This retrieves relevant documents from the vector store and generates an answer 
 
 The application uses Groq for LLM inference.
 
-The model is configured in `app/components/llm.py`.
+The model is configured in:
+
+```text
+app/components/llm.py
+```
+
+Current model:
+
+```text
+qwen/qwen3.6-27b
+```
+
+The application uses a low temperature for focused responses and disables exposed reasoning output.
+
+Example configuration:
 
 ```python
 llm = ChatGroq(
     model="qwen/qwen3.6-27b",
     temperature=0.2,
-    max_tokens=512,
-    groq_api_key=GROQ_API_KEY
+    max_tokens=1024,
+    reasoning_effort="none",
+    reasoning_format="hidden",
+    groq_api_key=GROQ_API_KEY,
 )
 ```
-
-The lower temperature value helps generate more consistent and focused responses.
 
 ---
 
 # 🛡️ Error Handling
 
-The application includes error handling for common scenarios such as:
+The application includes handling for common scenarios such as:
 
 - Missing JSON request data
 - Empty user questions
 - Missing API keys
 - RAG pipeline failures
-- LLM loading errors
-- Vector store errors
+- LLM loading failures
+- Vector store failures
 
-Errors are logged using the application's centralized logging system.
-
----
-
-# 📊 Future Improvements
-
-Potential improvements for the project include:
-
-- Source citations for generated answers
-- Streaming LLM responses
-- User authentication
-- Chat history persistence
-- PostgreSQL database integration
-- Docker Compose deployment
-- CI/CD pipeline
-- Kubernetes deployment
-- Evaluation metrics for RAG responses
-- Reranking retrieved documents
-- Hybrid search
-- Redis caching
-- User feedback collection
-- Monitoring and observability
-- Automated RAG evaluation
+Errors are logged through the application's centralized logging system.
 
 ---
 
 # 🐳 Docker
 
-The project can be containerized using Docker.
+The application includes a production Dockerfile and runs using Gunicorn.
 
-Build the Docker image:
+## Build the Image
 
 ```bash
 docker build -t medical-rag .
 ```
 
-Run the container:
+## Run the Container
 
 ```bash
 docker run -p 5001:5001 --env-file .env medical-rag
 ```
 
-The application should then be accessible on:
+The application will be available at:
 
 ```text
 http://localhost:5001
 ```
+
+The container starts the Flask application with:
+
+```text
+gunicorn --bind 0.0.0.0:5001 app.application:app
+```
+
+---
+
+# 🔄 CI/CD with Jenkins
+
+The project includes a Jenkins pipeline for continuous integration.
+
+The Jenkins pipeline performs steps such as:
+
+```text
+GitHub Checkout
+      ↓
+Environment Check
+      ↓
+Install Dependencies
+      ↓
+Run Tests
+      ↓
+Build Docker Image
+      ↓
+Trivy Security Scan
+```
+
+The pipeline configuration is stored in:
+
+```text
+Jenkinsfile
+```
+
+Jenkins is run using a custom Docker image defined in:
+
+```text
+custom_jenkins/Dockerfile
+```
+
+---
+
+# 🔒 Container Security
+
+Trivy is used to scan the Docker image for vulnerabilities.
+
+Example:
+
+```bash
+trivy image --severity HIGH,CRITICAL medical-rag-app:latest
+```
+
+This helps identify high- and critical-severity vulnerabilities in the container image.
+
+---
+
+# ☁️ Railway Deployment
+
+The application is deployed to Railway using the GitHub repository.
+
+## Production URL
+
+```text
+https://medical-rag-assistant-production-b715.up.railway.app
+```
+
+The Railway service runs the Dockerized application using Gunicorn.
+
+The required production environment variable is:
+
+```text
+GROQ_API_KEY
+```
+
+Railway deploys the application from the `main` branch.
+
+---
+
+# 🔁 Deployment Architecture
+
+```text
+                 GitHub
+                   │
+                   ├──────────────► Railway
+                   │                  │
+                   │                  ▼
+                   │             Docker Build
+                   │                  │
+                   │                  ▼
+                   │          Gunicorn + Flask
+                   │                  │
+                   │                  ▼
+                   │          Public RAG App
+                   │
+                   ▼
+                Jenkins
+                   │
+                   ├── Tests
+                   ├── Docker Build
+                   └── Trivy Scan
+```
+
+---
+
+# 📊 Current Project Details
+
+The current knowledge base contains the medical content used to build the FAISS index.
+
+The ingestion pipeline produced:
+
+```text
+Readable document pages: 1345
+Text chunks:              6217
+Embedding dimension:       384
+Embedding model:           all-MiniLM-L6-v2
+```
+
+The stored vector index is located at:
+
+```text
+vectorstore/faiss_index/
+```
+
+---
+
+# 🚀 Future Improvements
+
+- Source citations for generated answers
+- Streaming LLM responses
+- User authentication
+- Persistent chat history
+- PostgreSQL integration
+- Reranking retrieved documents
+- Hybrid search
+- Redis caching
+- User feedback collection
+- RAG evaluation metrics
+- Automated RAG evaluation
+- Monitoring and observability
+- Kubernetes deployment
 
 ---
 
@@ -569,3 +736,7 @@ http://localhost:5001
 **Madhav Manoj**
 
 ---
+
+## ⚠️ Disclaimer
+
+This application is a technical demonstration of a Retrieval-Augmented Generation system for educational and research purposes. It is not a medical diagnostic tool and should not replace advice from qualified healthcare professionals.
